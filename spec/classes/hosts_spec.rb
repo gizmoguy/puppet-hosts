@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe 'hosts' do
   let(:hosts_file) { '/etc/hosts' }
-  let(:fqdn_warning) { 'fqdn warning' }
 
   context 'file resource' do
     it { should contain_file(hosts_file).with(
@@ -14,32 +13,16 @@ describe 'hosts' do
   end
 
   context 'self' do
-    context 'domain and FQDN set correctly' do
+    context 'domain and certificate set correctly' do
       let(:facts) {{
         :hostname   => 'foo',
         :domainname => 'example.com',
-        :fqdn       => 'foo.example.com',
+        :clientcert => 'foo.example.com',
       }}
 
       it { should contain_file(hosts_file).with_content(
         /^127\.0\.1\.1 foo.example.com foo$/
       )}
-
-      it { should_not contain_notify(fqdn_warning) }
-    end
-
-    context 'domain and FQDN missing' do
-      let(:facts) {{
-        :hostname   => 'foo',
-        :domainname => nil,
-        :fqdn       => nil,
-      }}
-
-      it { should contain_file(hosts_file).with_content(
-        /^127\.0\.1\.1  foo$/
-      )}
-
-      it { should contain_notify(fqdn_warning) }
     end
   end
 
